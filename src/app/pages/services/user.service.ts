@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environment/environment';
 
@@ -10,7 +11,8 @@ export class UserService {
 
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   private getHeaders(): HttpHeaders {
@@ -32,7 +34,17 @@ export class UserService {
     return this.http.post(`${environment.apiUrl}/users`, { name, email, password, age, dateCreated }, {headers: this.getHeaders()})
   }
 
+  checkUserLoggedIn() {
+    const token = localStorage.getItem('token');
+
+    if(token) {
+      return;
+    }else{
+      return this.router.navigate(['/auth']);
+    }
+  }
   logout() {
-    return localStorage.removeItem('token');
+    localStorage.removeItem('token');
+    return this.router.navigate(['/auth'])
   }
 }

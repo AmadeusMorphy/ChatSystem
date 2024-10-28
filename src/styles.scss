@@ -3,6 +3,17 @@
 @import "primeng/resources/themes/mdc-dark-deeppurple/theme.css";
 
 
+
+:root {
+  --primary-color: #5400b5;
+}
+
+::ng-deep button.p-element.p-button.p-component{
+  background-color: var(--primary-color) !important;
+}
+body {
+  margin: 0;
+}
 .no-scroll {
     overflow: hidden;
 }

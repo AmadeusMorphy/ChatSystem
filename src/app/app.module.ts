@@ -13,6 +13,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './pages/home/home.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { LoadingComponent } from './pages/widgets/loading/loading.component';
+import { HeaderComponent } from './pages/widgets/header/header.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -20,7 +25,8 @@ import { LoadingComponent } from './pages/widgets/loading/loading.component';
     ChatComponent,
     HomeComponent,
     AuthComponent,
-    LoadingComponent
+    LoadingComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -33,9 +39,11 @@ import { LoadingComponent } from './pages/widgets/loading/loading.component';
     HttpClientModule,
     ButtonModule,
     InputTextModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ToastModule,
+    ConfirmDialogModule
   ],
-  providers: [],
+  providers: [ConfirmationService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -20,13 +20,7 @@ export class HomeComponent {
   }
 
   checkUserLoggedIn() {
-    const token = localStorage.getItem('token');
-
-    if(token) {
-      return;
-    }else{
-      this.router.navigate(['/auth']);
-    }
+    this.userService.checkUserLoggedIn();
   }
 
   logout() {

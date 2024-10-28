@@ -3,9 +3,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { ChatComponent } from './pages/chat/chat.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { HomeComponent } from './pages/home/home.component';
+import { HeaderComponent } from './pages/widgets/header/header.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
+  { path: 'header', component: HeaderComponent },
   {path: 'chat', component: ChatComponent},
   {path: 'auth', component: AuthComponent},
   {path: 'home', component: HomeComponent}
