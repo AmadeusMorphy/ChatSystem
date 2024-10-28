@@ -16,12 +16,13 @@ interface Message {
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  messagesId: string = 'messages'
+  messagesId: string = ''
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
   async getMessages(messageID: string) {
+    this.messagesId = messageID;
     return await this.supabase
       .from(messageID)
       .select('*')
@@ -31,8 +32,8 @@ export class SupabaseService {
   subscribeToMessages(): Observable<Message> {
     return new Observable((observer) => {
       const subscription = this.supabase
-        .channel('public:messages')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        .channel(`public:${this.messagesId}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: this.messagesId }, (payload) => {
           observer.next(payload.new as Message);
         })
         .subscribe();
@@ -43,11 +44,12 @@ export class SupabaseService {
     });
   }
 
-  async sendMessage(content: string) {
+  async sendMessage(content: string, receiverId: string) {
     const { data: { user } } = await this.supabase.auth.getUser();
-    return await this.supabase.from('messages').insert({
+    return await this.supabase.from(this.messagesId).insert({
       content,
-      sender: 'user123'
+      sender_id: localStorage.getItem('userId'),
+      receiver_id: receiverId
     });
   }
 

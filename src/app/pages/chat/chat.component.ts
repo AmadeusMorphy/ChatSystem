@@ -30,18 +30,21 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectedUser: string = '';
   private subscription: any;
-  currentUserId: string | undefined;
+  currentUserId: any;
   messageId: string = ''
 
   friends: any;
   friendsBlock: any;
+
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
     private userService: UserService
   ) {
+    this.currentUserId = localStorage.getItem('userId');
     this.messageForm = this.formBuilder.group({
-      content: ['', Validators.required]
+      content: ['', Validators.required],
+      sender: this.currentUserId
     });
   }
 
@@ -125,7 +128,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   async sendMessage() {
     if (this.messageForm.valid) {
       const content = this.messageForm.get('content')?.value;
-      const { data, error } = await this.supabase.sendMessage(content);
+      const { data, error } = await this.supabase.sendMessage(content, this.selectedUser);
       if (error) {
         console.error('Error sending message:', error);
       } else {
@@ -136,11 +139,11 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   async getCurrentUser() {
     const { data: { user } } = await this.supabase.getCurrentUser();
-    this.currentUserId = 'user123';
+    this.currentUserId = localStorage.getItem('userId');
   }
 
   isOwnMessage(message: any): boolean {
-    return message.sender === this.currentUserId;
+    return message.sender_id === this.currentUserId;
   }
 
   selectUser(user: any) {
