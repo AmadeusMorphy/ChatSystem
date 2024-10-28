@@ -10,10 +10,14 @@ import { environment } from 'src/environment/environment';
 export class UserService {
 
 
+  currentUserId: any;
+
   constructor(
     private http: HttpClient,
     private router: Router
-  ) { }
+  ) {
+    this.currentUserId = localStorage.getItem('userId');
+   }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -42,6 +46,11 @@ export class UserService {
     return this.http.get(`${environment.apiUrl}/${userId}`, {headers: this.getHeaders()})
   }
 
+
+  addFriend(idFriend: string): Observable<any> {
+
+    return this.http.post(`${environment.apiUrl}/add-friend/${this.currentUserId}`, {friendId: idFriend}, {headers: this.getHeaders()})
+  }
   checkUserLoggedIn() {
     const token = localStorage.getItem('token');
 
