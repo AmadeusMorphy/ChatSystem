@@ -31,7 +31,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   selectedUser: string = '';
   private subscription: any;
   currentUserId: string | undefined;
-  messageId: string = 'messages'
+  messageId: string = ''
 
   friends: any;
   friendsBlock: any;
@@ -61,7 +61,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   getFriends() {
     this.userService.getCurrentUserData().subscribe(
       res => {
-
+        console.log(res);
+        
         const counter = res[0].friendships?.length;
         const userRequests = [];
 
@@ -90,6 +91,17 @@ export class ChatComponent implements OnInit, OnDestroy {
     )
   }
 
+  filterSelectedFriend(selectedId: string) {
+    this.userService.getCurrentUserData().subscribe(
+      res => {
+        const test = res[0].friendships.filter((item: any) => item.friendId === selectedId)[0].messagesId
+        console.log('FILTERED THIS: ', test);
+        this.messageId = test;
+        this.loadMessages();
+        this.subscribeToMessages()
+      }
+    )
+  }
   async loadMessages() {
     const { data, error } = await this.supabase.getMessages(this.messageId);
     if (error) {
@@ -133,7 +145,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectUser(user: any) {
     this.selectedUser = user[0].id
-    console.log('Selected user:', this.selectedUser);
+    this.messageId = user[0].id
+    console.log('Selected user:', this.messageId);
+    this.filterSelectedFriend(this.messageId)
     // Handle user selection logic here
   }
 }
