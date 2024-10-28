@@ -1,0 +1,20 @@
+<div class="container flex flex-wrap gap-6 pt-10rem justify-content-center">
+    <div class="card" *ngFor="let user of users; let i = index" [ngClass]="{'cardAnimation': !isLoading}"
+        [ngStyle]="{'animation-delay': (i * 0.1) + 's'}">
+        <div class="profileImage flex justify-content-center align-items-center">
+
+            <p-skeleton *ngIf="user.profileImg && user.profileImg?.length > 0 && imgLoadingStates[i]"
+                styleClass="border-circle w-11rem h-11rem"></p-skeleton>
+
+            <img *ngIf="user.profileImg && user.profileImg.length > 0" [src]="user.profileImg"
+                [hidden]="imgLoadingStates[i]" [ngClass]="imgLoadingStates[i] ? 'hidden' : ''" (load)="imgLoaded(i)">
+
+            <img *ngIf="!user.profileImg || user.profileImg.length < 1" src="assets/image1.png" alt="">
+        </div>
+        <div class="textContainer flex justify-content-around align-items-center">
+            <p class="name">{{user.name}}</p>
+            <button pButton icon="pi pi-user-plus" style="height: 30px; width: 30px !important;"
+                (click)="sendReq(i)"></button>
+        </div>
+    </div>
+</div>

@@ -34,6 +34,14 @@ export class UserService {
     return this.http.post(`${environment.apiUrl}/users`, { name, email, password, age, dateCreated }, {headers: this.getHeaders()})
   }
 
+  getUserId(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/validate-token`, {headers: this.getHeaders()})
+  }
+
+  getUserById(userId: string): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/${userId}`, {headers: this.getHeaders()})
+  }
+
   checkUserLoggedIn() {
     const token = localStorage.getItem('token');
 

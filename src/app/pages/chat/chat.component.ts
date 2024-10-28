@@ -19,9 +19,17 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class ChatComponent implements OnInit, OnDestroy {
   messages: any[] = [];
   messageForm: FormGroup;
+  fakeUsers = [
+    {id: 1 ,name: 'User1', status: 'Online', profileImage: 'https://via.placeholder.com/50' },
+    {id: 2 ,name: 'User2', status: 'Offline', profileImage: 'https://via.placeholder.com/50' },
+    {id: 3 ,name: 'User3', status: 'Online', profileImage: 'https://via.placeholder.com/50' },
+    // Add more users as needed
+];
+
+selectedUser: string = '';
   private subscription: any;
   currentUserId: string | undefined;
-
+messageId: string = 'messages'
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder
@@ -44,7 +52,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   async loadMessages() {
-    const { data, error } = await this.supabase.getMessages();
+    const { data, error } = await this.supabase.getMessages(this.messageId);
     if (error) {
       console.error('Error fetching messages:', error);
     } else {
@@ -83,4 +91,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   isOwnMessage(message: any): boolean {
     return message.sender === this.currentUserId;
   }
+
+  selectUser(user: any) {
+    this.selectedUser = user.id
+    console.log('Selected user:', this.selectedUser);
+    // Handle user selection logic here
+}
 }

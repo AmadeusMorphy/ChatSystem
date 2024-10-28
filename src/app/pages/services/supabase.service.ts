@@ -16,13 +16,14 @@ interface Message {
 export class SupabaseService {
   private supabase: SupabaseClient;
 
+  messagesId: string = 'messages'
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
-  async getMessages() {
+  async getMessages(messageID: string) {
     return await this.supabase
-      .from('messages')
+      .from(messageID)
       .select('*')
       .order('created_at', { ascending: true });
   }

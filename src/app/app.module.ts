@@ -18,6 +18,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { AddFriendComponent } from './pages/friends/add-friend/add-friend.component';
+import { UserFriendsComponent } from './pages/friends/user-friends/user-friends.component';
+import { FriendReqsComponent } from './pages/friends/friend-reqs/friend-reqs.component';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @NgModule({
   declarations: [
@@ -26,7 +30,10 @@ import { MessageService } from 'primeng/api';
     HomeComponent,
     AuthComponent,
     LoadingComponent,
-    HeaderComponent
+    HeaderComponent,
+    AddFriendComponent,
+    UserFriendsComponent,
+    FriendReqsComponent
   ],
   imports: [
     BrowserModule,
@@ -41,7 +48,8 @@ import { MessageService } from 'primeng/api';
     InputTextModule,
     ReactiveFormsModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    SkeletonModule
   ],
   providers: [ConfirmationService, MessageService],
   bootstrap: [AppComponent]

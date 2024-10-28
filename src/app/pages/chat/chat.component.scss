@@ -92,8 +92,7 @@
 
 .chat-container {
     width: 100%;
-    max-width: 420px;
-    margin: auto;
+    // max-width: 700px;
     display: flex;
     flex-direction: column;
     height: 90vh;
@@ -173,6 +172,12 @@
           border-color: #8215db !important;
         }
       }
+
+      .profImg{
+        border-radius: 100px;
+        height: 20px;
+        width: 20px;
+      }
   
     //   button {
     //     background: linear-gradient(135deg, #007aff, #34b3f4);
@@ -214,3 +219,55 @@ i{
   .pi-images, .pi-send {
     color: #943bdd;
   }
+
+  .dmsContainer {
+    display: flex;
+    gap: 20px;
+}
+
+.user-list {
+    width: 100%;
+    max-width: 600px;
+    height: 91vh;
+    background: #1a1a1a;
+    border-radius: 16px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.user:hover {
+    background: #333333;
+}
+
+.user-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-info {
+    margin-left: 10px;
+    color: #f1f1f1;
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.user-status {
+    font-size: 0.85rem;
+    color: #b3b3b3;
+}

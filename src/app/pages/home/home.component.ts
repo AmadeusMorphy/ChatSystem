@@ -9,6 +9,8 @@ import { UserService } from '../services/user.service';
 })
 export class HomeComponent {
 
+  currentUserId: any;
+
   constructor(
     private router: Router,
     private userService: UserService
@@ -17,10 +19,21 @@ export class HomeComponent {
   ngOnInit(): void {
     
     this.checkUserLoggedIn();
+    this.getUsers();
   }
 
   checkUserLoggedIn() {
     this.userService.checkUserLoggedIn();
+    this.currentUserId = localStorage.getItem('userId')
+  }
+
+  getUsers() {
+    this.userService.getUserById(this.currentUserId).subscribe(
+      res => {
+        console.log(res);
+        
+      }
+    )
   }
 
   logout() {

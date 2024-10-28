@@ -1,39 +1,58 @@
-<div class="chat-container">
 
-    <div class="chat-header">
-        <div class="headerItems flex align-items-center justify-content-between">
+<div class="dmsContainer flex justify-content-between">
 
-            <div class="w-2 flex align-items-center gap-3">
+    
+  <!--ADD IT HERE-->
 
-                <i class="pi pi-angle-left ml-4 text-3xl"></i>
-
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOxYHstHPaqXtUZFjxrqn88O3mGfNcNXMlwQ&s"
-                    class="profImg w-9 h-9 border-circle" alt="">
-
-                <div class="userName">
-                    <p class=" w-9rem">User Name</p>
-                </div>
-            </div>
-
-            <div class="iconBtns m-4 flex gap-4">
-                <i class="pi pi-video text-2xl"></i>
-                <i class="pi pi-phone text-2xl"></i>
-
-            </div>
+  <div class="user-list">
+    <div class="user" *ngFor="let user of fakeUsers" (click)="selectUser(user)">
+        <img [src]="user.profileImage" class="user-img" alt="User Profile">
+        <div class="user-info">
+            <p class="user-name">{{ user.name }}</p>
+            <p class="user-status">{{ user.status }}</p>
         </div>
     </div>
-    <div class="chat-body">
-      <div *ngFor="let message of messages" 
-           class="message" 
-           [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}"
-           [@messageAnimation]>
-        {{ message.content }}
-      </div>
-    </div>
-    <form [formGroup]="messageForm" (ngSubmit)="sendMessage()" class="flex align-items-center justify-content-center gap-4 w-full">
-        
-      <input pInputText type="text" class="h-5rem" style="border-radius: 30px; max-width: 30vh; width: 100%;" formControlName="content" placeholder="Type a message..." class="message-input">
-      <button type="submit" pButton [disabled]="!messageForm.valid" class="send-button">Send</button>
+</div>
+<div *ngIf="!selectedUser" class="NoUser flex justify-content-center align-items-center" style="margin-right: 30%;">
+    No user selected
+</div>
+    <div *ngIf="selectedUser" class="chat-container">
     
-    </form>
-  </div>
+        <div class="chat-header">
+            <div class="headerItems flex align-items-center justify-content-between">
+    
+                <div class="w-2 flex align-items-center gap-3">
+    
+                    <i class="pi pi-angle-left ml-4 text-3xl"></i>
+    
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOxYHstHPaqXtUZFjxrqn88O3mGfNcNXMlwQ&s"
+                        class="profImg" style="border-radius: 100%; height: 50px; width: 50px;" alt="">
+    
+                    <div class="userName">
+                        <p class=" w-9rem">User Name</p>
+                    </div>
+                </div>
+    
+                <div class="iconBtns m-4 flex gap-4">
+                    <i class="pi pi-video text-2xl"></i>
+                    <i class="pi pi-phone text-2xl"></i>
+    
+                </div>
+            </div>
+        </div>
+        <div class="chat-body">
+            <div *ngFor="let message of messages" class="message"
+                [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [@messageAnimation]>
+                {{ message.content }}
+            </div>
+        </div>
+        <form [formGroup]="messageForm" (ngSubmit)="sendMessage()"
+            class="flex align-items-center justify-content-center gap-4 w-full">
+    
+            <input pInputText type="text" class="h-5rem" style="border-radius: 30px; max-width: 30vh; width: 100%;"
+                formControlName="content" placeholder="Type a message..." class="message-input">
+            <button type="submit" pButton [disabled]="!messageForm.valid" class="send-button">Send</button>
+    
+        </form>
+    </div>
+</div>

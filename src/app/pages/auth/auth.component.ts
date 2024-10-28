@@ -52,6 +52,11 @@ export class AuthComponent {
       response => {
 
         localStorage.setItem('token', response.token);
+        this.userService.getUserId().subscribe(
+          res => {
+            localStorage.setItem('userId', res.user.id);
+          }
+        )
         this.isLoading = false;
         this.router.navigate(['/home']);
       },
