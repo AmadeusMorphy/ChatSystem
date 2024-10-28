@@ -1,6 +1,3 @@
-
-
-
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -13,11 +10,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button'
 import { InputTextModule } from 'primeng/inputtext';
+import { HomeComponent } from './pages/home/home.component';
+import { AuthComponent } from './pages/auth/auth.component';
+import { LoadingComponent } from './pages/widgets/loading/loading.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ChatComponent
+    ChatComponent,
+    HomeComponent,
+    AuthComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,
