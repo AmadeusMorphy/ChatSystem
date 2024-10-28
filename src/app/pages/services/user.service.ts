@@ -46,7 +46,9 @@ export class UserService {
     return this.http.get(`${environment.apiUrl}/${userId}`, {headers: this.getHeaders()})
   }
 
-
+  getCurrentUserData(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/${this.currentUserId}`, {headers: this.getHeaders()})
+  }
   addFriend(idFriend: string): Observable<any> {
 
     return this.http.post(`${environment.apiUrl}/add-friend/${this.currentUserId}`, {friendId: idFriend}, {headers: this.getHeaders()})

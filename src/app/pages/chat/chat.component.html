@@ -5,11 +5,11 @@
   <!--ADD IT HERE-->
 
   <div class="user-list">
-    <div class="user" *ngFor="let user of fakeUsers" (click)="selectUser(user)">
-        <img [src]="user.profileImage" class="user-img" alt="User Profile">
+    <div class="user" *ngFor="let user of friendsBlock" (click)="selectUser(user)">
+        <img [src]="user[0]?.profileImg" class="user-img" alt="User Profile">
         <div class="user-info">
-            <p class="user-name">{{ user.name }}</p>
-            <p class="user-status">{{ user.status }}</p>
+            <p class="user-name">{{ user[0]?.name }}</p>
+            <p class="user-status">{{ user[0].id }}</p>
         </div>
     </div>
 </div>
