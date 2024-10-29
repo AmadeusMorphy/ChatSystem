@@ -22,7 +22,8 @@ import { AddFriendComponent } from './pages/friends/add-friend/add-friend.compon
 import { UserFriendsComponent } from './pages/friends/user-friends/user-friends.component';
 import { FriendReqsComponent } from './pages/friends/friend-reqs/friend-reqs.component';
 import { SkeletonModule } from 'primeng/skeleton';
-
+import {NgxImageCompressService} from 'ngx-image-compress';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
 @NgModule({
   declarations: [
     AppComponent,
@@ -49,9 +50,10 @@ import { SkeletonModule } from 'primeng/skeleton';
     ReactiveFormsModule,
     ToastModule,
     ConfirmDialogModule,
-    SkeletonModule
+    SkeletonModule,
+    LazyLoadImageModule
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService, NgxImageCompressService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

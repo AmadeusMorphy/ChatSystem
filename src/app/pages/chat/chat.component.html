@@ -41,10 +41,16 @@
             </div>
         </div>
         <div class="chat-body">
+            <div class="noMessage flex justify-content-center align-items-center">
+            <h2 *ngIf="isMessages < 1">Send something 😁</h2>
+
+            </div>
             <div *ngFor="let message of messages" class="message"
                 [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [@messageAnimation]>
                 {{ message.content }}
             </div>
+                
+
         </div>
         <form [formGroup]="messageForm" (ngSubmit)="sendMessage()"
             class="flex align-items-center justify-content-center gap-4 w-full">

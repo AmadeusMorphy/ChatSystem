@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../services/user.service';
 import { forkJoin } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid'; 
 
 @Component({
   selector: 'app-chat',
@@ -32,7 +33,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private subscription: any;
   currentUserId: any;
   messageId: string = ''
-
+  isMessages: any;
   friends: any;
   friendsBlock: any;
 
@@ -111,31 +112,63 @@ export class ChatComponent implements OnInit, OnDestroy {
       console.error('Error fetching messages:', error);
     } else {
       this.messages = data;
+      this.isMessages = this.messages.length
     }
   }
-
   subscribeToMessages() {
     this.subscription = this.supabase.subscribeToMessages().subscribe(
       (newMessage) => {
-        this.messages.push(newMessage);
+        // Only add if the message does not already exist
+        const messageExists = this.messages.some((msg) => msg.id === newMessage.id);
+        
+        if (!messageExists) {
+          this.messages.push(newMessage);
+        }
       },
       (error) => {
         console.error('Error in message subscription:', error);
       }
     );
   }
+  
 
-  async sendMessage() {
-    if (this.messageForm.valid) {
-      const content = this.messageForm.get('content')?.value;
+async sendMessage() {
+  if (this.messageForm.valid) {
+    const content = this.messageForm.get('content')?.value;
+    
+    // Create a temporary message to display immediately
+    const tempMessage = {
+      id: uuidv4(),
+      content: content,
+      sender_id: this.currentUserId,
+      timestamp: new Date(),
+      isTemporary: true // Flag to differentiate unsaved messages
+    };
+
+    // Add the temporary message to the messages array
+    this.messages.push(tempMessage);
+    this.messageForm.reset(); // Clear the input field
+
+    try {
+      // Send the message to the backend
       const { data, error } = await this.supabase.sendMessage(content, this.selectedUser);
+
       if (error) {
         console.error('Error sending message:', error);
+        // Handle error by removing the temporary message
+        this.messages = this.messages.filter((msg) => msg !== tempMessage);
       } else {
-        this.messageForm.reset();
+        // Replace the temporary message with the saved message data from the backend
+        this.subscribeToMessages()
+        Object.assign(tempMessage, data, { isTemporary: false });
       }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      this.messages = this.messages.filter((msg) => msg !== tempMessage);
     }
   }
+}
+
 
   async getCurrentUser() {
     const { data: { user } } = await this.supabase.getCurrentUser();

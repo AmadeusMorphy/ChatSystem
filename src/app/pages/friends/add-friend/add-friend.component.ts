@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { UserService } from '../../services/user.service';
+import { NgxImageCompressService } from 'ngx-image-compress';
 
 @Component({
   selector: 'app-add-friend',
@@ -12,15 +13,19 @@ export class AddFriendComponent {
   users: any;
   isLoading = false;
   currentUserId: any;
+  imgResultBeforeCompression: string = 'https://i.ibb.co/PgTRS4z/Pizigani-1367-Chart-10-MB.jpg'
+  imgResultAfterCompression: string = 'https://i.ibb.co/PgTRS4z/Pizigani-1367-Chart-10-MB.jpg';
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private imageCompress: NgxImageCompressService
   ) {
     this.currentUserId = localStorage.getItem('userId');
   }
 
   ngOnInit(): void {
     this.getUsers();
+    // this.compressFile()
   }
 
   getUsers() {
@@ -30,6 +35,7 @@ export class AddFriendComponent {
         this.users = res.filter((item: any) => {
           if(item.id === this.currentUserId) return false;
           if(item.friendships?.filter((item: any) => item.id === this.currentUserId)) return false;
+          
           return true;
         })
         console.log(this.users);
@@ -63,4 +69,18 @@ export class AddFriendComponent {
       }
     )
   }
+
+//   compressFile() {
+//     this.imageCompress.uploadFile().then(({image, orientation}) => {
+//         this.imgResultBeforeCompression = image;
+//         console.log('Size in bytes of the uploaded image was:', this.imageCompress.byteCount(image));
+
+//         this.imageCompress
+//             .compressFile(image, orientation, 50, 50) // 50% ratio, 50% quality
+//             .then(compressedImage => {
+//                 this.imgResultAfterCompression = compressedImage;
+//                 console.log('Size in bytes after compression is now:', this.imageCompress.byteCount(compressedImage));
+//             });
+//     });
+// }
 }
