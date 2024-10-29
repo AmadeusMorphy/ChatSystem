@@ -34,11 +34,14 @@ export class AddFriendComponent {
       res => {
         this.users = res.filter((item: any) => {
           if(item.id === this.currentUserId) return false;
-          if(item.friendships?.filter((item: any) => item.id === this.currentUserId)) return false;
+          // console.log(item.friendships?.some((item: any) => item.friendId));
+          // console.log(this.currentUserId);
+          
+          if(item.friendships?.some((item: any) => item?.friendId === this.currentUserId)) return false;
           
           return true;
         })
-        console.log(this.users);
+        // console.log(this.users);
         this.isLoading = false;
 
         
