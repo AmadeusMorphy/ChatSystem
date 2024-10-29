@@ -11,13 +11,12 @@
     </div>
 
     <!-- Chat Container -->
-    <div *ngIf="!isInboxVisible || selectedUser || !isMobileView" class="chat-container">
+    <div *ngIf="(!isInboxVisible || selectedUser || !isMobileView) && selectedUser" class="chat-container">
         <div class="chat-header">
             <div class="headerItems flex align-items-center justify-content-between">
                 <div class="w-2 flex align-items-center gap-3">
                     <i (click)="toggleInboxView()" class="mobileBtn pi pi-angle-left ml-4 text-3xl"></i>
-                    <img [src]="openedChat?.profileImg"
-                        class="profImg" alt="">
+                    <img [src]="openedChat?.profileImg" class="profImg" alt="">
                     <div class="userName">
                         <p class="w-9rem">{{openedChat?.name || 'NaN'}}</p>
                     </div>
@@ -30,15 +29,20 @@
         </div>
         <div class="chat-body">
             <div class="noMessage flex justify-content-center align-items-center">
-                <h2 *ngIf="isMessages < 1">Send something 😁</h2>
-              </div>
-              <div *ngFor="let message of messages" class="message" [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}">
+                <h2 *ngIf="isMessages < 1"  [hidden]="isChatLoading">Send something 😁</h2>
+            </div>
+            <div *ngFor="let skeleton of shuffledSkeletons" class="skeletonChat" [hidden]="!isChatLoading">
+                <p-skeleton [width]="skeleton.width" [height]="skeleton.height" [styleClass]="skeleton.styleClass" borderRadius="16px" />
+            </div>
+            <div *ngFor="let message of messages" class="message"
+                [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [hidden]="isChatLoading">
                 {{ message.content }}
-              </div>
+            </div>
         </div>
         <form [formGroup]="messageForm" (ngSubmit)="sendMessage()"
             class="chat-input flex align-items-center justify-content-center gap-4 w-full">
-            <input pInputText style="border-radius: 30px; max-width: 30vh; width: 100%;" type="text" formControlName="content" placeholder="Type a message...">
+            <input pInputText style="border-radius: 30px; max-width: 30vh; width: 100%;" type="text"
+                formControlName="content" placeholder="Type a message...">
             <button type="submit" pButton [disabled]="!messageForm.valid" class="send-button">Send</button>
         </form>
     </div>

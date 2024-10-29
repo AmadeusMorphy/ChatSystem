@@ -34,6 +34,20 @@ export class ChatComponent implements OnInit, OnDestroy {
   isSending = false;
   showMessage = false;
   openedChat: any;
+  isChatLoading = false;
+
+  skeletons = [
+    { width: '20rem', height: '5rem', styleClass: 'mb-2 ml-auto' },
+    { width: '10rem', height: '3rem', styleClass: 'mb-2' },
+    { width: '6rem', height: '3rem', styleClass: 'mb-2 ml-auto' },
+    { width: '30rem', height: '8rem', styleClass: 'mb-2' },
+    { width: '10rem', height: '4rem' },
+    { width: '16rem', height: '7rem', styleClass: 'mb-2 ml-auto' },
+    { width: '10rem', height: '4rem', styleClass: 'mb-2 ml-auto' }
+  ];
+
+  shuffledSkeletons = [...this.skeletons];
+
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
@@ -109,12 +123,16 @@ export class ChatComponent implements OnInit, OnDestroy {
     )
   }
   async loadMessages() {
+    this.isChatLoading = true;
+
     const { data, error } = await this.supabase.getMessages(this.messageId);
     if (error) {
       console.error('Error fetching messages:', error);
+      this.isChatLoading = false;
     } else {
       this.messages = data;
       this.isMessages = this.messages.length
+      this.isChatLoading = false;
     }
   }
   subscribeToMessages() {
@@ -184,6 +202,8 @@ async sendMessage() {
   }
 
   selectUser(user: any) {
+    this.shuffleSkeletons();
+    this.isChatLoading = true;
     this.messageId = user[0].id;
     this.filterSelectedFriend(this.messageId);
     this.selectedUser = user[0].id
@@ -191,9 +211,16 @@ async sendMessage() {
     this.openedChat = user[0]
     console.log('Selected user:', user[0]);
     // Handle user selection logic here
-  }
+}
 
   toggleInboxView() {
   this.isInboxVisible = !this.isInboxVisible;
   }
+
+  shuffleSkeletons() {
+    this.shuffledSkeletons = [...this.skeletons]
+      .sort(() => Math.random() - 0.5); // Randomly reorder skeletons
+  }
+
+
 }
