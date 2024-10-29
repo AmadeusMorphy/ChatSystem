@@ -45,10 +45,11 @@
             <div *ngFor="let message of messages" class="message"
                 [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}"
                 [hidden]="isChatLoading">
-                
-                <img [src]="message.images_url" alt="" style="position: relative; width: 100%; margin-left: auto; border-radius: 20px;">
+
+                <img [src]="message.images_url" alt=""
+                    style="position: relative; width: 100%; margin-left: auto; border-radius: 20px;">
                 {{ message.content }}
-                
+
             </div>
         </div>
         <form *ngIf="selectedUser" [formGroup]="messageForm" (ngSubmit)="sendMessage()"
@@ -56,13 +57,14 @@
             <input pInputText style="border-radius: 30px; max-width: 30vh; width: 100%;" type="text"
                 formControlName="content" placeholder="Type a message...">
 
-                <div class="custom-upload">
-                    <i class="pi pi-image text-2xl" (click)="fileInput.click()" style="cursor: pointer;"></i>
-                    <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
-                    <img *ngIf="previewUrl" [src]="previewUrl" class="thumbnail" alt="Preview Image">
-                </div>
+            <div class="custom-upload">
+                <i class="pi pi-image text-2xl" (click)="fileInput.click()" style="cursor: pointer;"></i>
+                <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
+                <img *ngIf="previewUrl" [src]="previewUrl" class="thumbnail" alt="Preview Image">
+            </div>
 
             <button type="submit" pButton [disabled]="!messageForm.valid" class="send-button">Send</button>
         </form>
+
     </div>
 </div>

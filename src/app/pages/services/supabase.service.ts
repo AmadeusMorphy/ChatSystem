@@ -45,14 +45,15 @@ export class SupabaseService {
     });
   }
 
-  async sendMessage(content: string, receiverId: string) {
+  async sendMessage(content: string, receiverId: string, images_url: string | null) {
     const { data: { user } } = await this.supabase.auth.getUser();
     return await this.supabase.from(this.messagesId).insert({
-      content,
-      sender_id: localStorage.getItem('userId'),
-      receiver_id: receiverId
+        content,
+        sender_id: localStorage.getItem('userId'),
+        receiver_id: receiverId,
+        images_url: images_url // Save the image URL
     });
-  }
+}
 
   async getCurrentUser() {
     return await this.supabase.auth.getUser();

@@ -171,43 +171,45 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   async sendMessage() {
     this.isSending = true;
+    const theImage = this.previewUrl;
+    this.previewUrl = null;
     if (this.messageForm.valid) {
-      const content = this.messageForm.get('content')?.value;
+        const content = this.messageForm.get('content')?.value;
+        
+        // Show the temporary message before the backend starts
+        const tempMessage = {
+            id: uuidv4(),
+            content: content,
+            sender_id: this.currentUserId,
+            timestamp: new Date(),
+            images_url: theImage,  // Include the preview URL here
+            isTemporary: true
+        };
 
-      /***TO SHOW THE SENT MESSAGE BEFORE THE BACKEND STARTS***/
-      const tempMessage = {
-        id: uuidv4(),
-        content: content,
-        sender_id: this.currentUserId,
-        timestamp: new Date(),
-        imageUrl: this.previewUrl,
-        isTemporary: true
-      };
-
-
-      this.messages.push(tempMessage);
-      this.messageForm.reset();
-      /********************************************************/
-      try {
-        // Send the message to the backend
-        const { data, error } = await this.supabase.sendMessage(content, this.selectedUser);
-
-        if (error) {
-          console.error('Error sending message:', error);
-          // Handle error by removing the temporary message
-          this.messages = this.messages.filter((msg) => msg !== tempMessage);
-        } else {
-          this.isSending = false;
-          // Replace the temporary message with the saved message data from the backend
-          this.subscribeToMessages()
-          Object.assign(tempMessage, data, { isTemporary: false });
+        this.messages.push(tempMessage);
+        this.messageForm.reset();
+        
+        try {
+            // Send the message to the backend
+            const { data, error } = await this.supabase.sendMessage(content, this.selectedUser, theImage); // Pass the image URL
+            
+            if (error) {
+                console.error('Error sending message:', error);
+                // Handle error by removing the temporary message
+                this.messages = this.messages.filter((msg) => msg !== tempMessage);
+            } else {
+                this.isSending = false;
+                // Replace the temporary message with the saved message data from the backend
+                this.subscribeToMessages()
+                Object.assign(tempMessage, data, { isTemporary: false });
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err);
+            this.messages = this.messages.filter((msg) => msg !== tempMessage);
         }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-        this.messages = this.messages.filter((msg) => msg !== tempMessage);
-      }
     }
-  }
+}
+
 
 
   async getCurrentUser() {
