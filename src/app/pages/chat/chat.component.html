@@ -46,7 +46,7 @@
                 [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}"
                 [hidden]="isChatLoading">
                 
-                <img [src]="message.images_url" alt="" style="position: relative; width: 100%; margin-left: auto;">
+                <img [src]="message.images_url" alt="" style="position: relative; width: 100%; margin-left: auto; border-radius: 20px;">
                 {{ message.content }}
                 
             </div>

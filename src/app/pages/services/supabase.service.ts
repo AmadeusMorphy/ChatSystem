@@ -8,6 +8,7 @@ interface Message {
   content: string;
   user_id: string;
   created_at: string;
+  images_url: string;
 }
 
 @Injectable({

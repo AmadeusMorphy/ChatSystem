@@ -145,6 +145,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       console.error('Error fetching messages:', error);
       this.isChatLoading = false;
     } else {
+      console.log("DATA: ", data);
+      
       this.messages = data;
       this.isMessages = this.messages.length
       this.isChatLoading = false;
