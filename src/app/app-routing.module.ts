@@ -16,7 +16,7 @@ const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'add-friend', component: AddFriendComponent},
   {path: 'friends', component: UserFriendsComponent},
-  {path: 'friend-reqs', component: FriendReqsComponent}
+  {path: 'friend-req', component: FriendReqsComponent}
 ];
 
 @NgModule({

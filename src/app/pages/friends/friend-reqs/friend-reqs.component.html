@@ -1,1 +1,23 @@
-<p>friend-reqs works!</p>
+<div class="container flex flex-wrap gap-6 pt-10rem justify-content-center">
+    <h3 *ngIf="counter === 0 || counter === undefined">You don't have any friend requests</h3>
+    <div class="card" *ngFor="let user of users; let i = index" [ngClass]="{'cardAnimation': !isLoading}"
+        [ngStyle]="{'animation-delay': (i * 0.1) + 's'}">
+        <div class="profileImage flex justify-content-center align-items-center">
+
+            <p-skeleton *ngIf="user[0]?.profileImg && user[0]?.profileImg?.length > 0 && imgLoadingStates[i]"
+                styleClass="border-circle w-11rem h-11rem"></p-skeleton>
+
+            <img *ngIf="user[0]?.profileImg && user[0]?.profileImg.length > 0" [src]="user[0]?.profileImg"
+                [hidden]="imgLoadingStates[i]" [ngClass]="imgLoadingStates[i] ? 'hidden' : ''" (load)="imgLoaded(i)">
+
+            <img *ngIf="!user[0]?.profileImg || user[0]?.profileImg.length < 1" src="assets/image1.png" alt="">
+        </div>
+        <div class="textContainer grid justify-content-around align-items-center">
+            <p class="name">{{user[0]?.name}}</p>
+            <div class="flex justify-content-center align-items-center gap-3">
+                <p-button severity="danger" icon="pi pi-times"></p-button>
+                <p-button severity="success" icon="pi pi-check" (onClick)="acceptReq(i)"></p-button>
+            </div>
+        </div>
+    </div>
+</div>

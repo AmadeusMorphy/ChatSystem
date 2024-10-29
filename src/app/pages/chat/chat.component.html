@@ -1,65 +1,45 @@
-
 <div class="dmsContainer flex justify-content-between">
-
-    
-  <!--ADD IT HERE-->
-
-  <div class="user-list">
-    <div class="user" *ngFor="let user of friendsBlock" (click)="selectUser(user)">
-        <img [src]="user[0]?.profileImg" class="user-img" alt="User Profile">
-        <div class="user-info">
-            <p class="user-name">{{ user[0]?.name }}</p>
-            <p class="user-status">{{ user[0].id }}</p>
+    <!-- User List / Inbox -->
+    <div *ngIf="isInboxVisible || !selectedUser || !isMobileView" class="user-list">
+        <div class="user" *ngFor="let user of friendsBlock" (click)="selectUser(user)">
+            <img [src]="user[0]?.profileImg" class="user-img">
+            <div class="user-info">
+                <p class="user-name">{{ user[0]?.name }}</p>
+                <p class="user-status">{{ user[0].id }}</p>
+            </div>
         </div>
     </div>
-</div>
-<div *ngIf="!selectedUser" class="NoUser flex justify-content-center align-items-center" style="margin-right: 30%;">
-    No user selected
-</div>
-    <div *ngIf="selectedUser" class="chat-container">
-    
+
+    <!-- Chat Container -->
+    <div *ngIf="!isInboxVisible || selectedUser || !isMobileView" class="chat-container">
         <div class="chat-header">
             <div class="headerItems flex align-items-center justify-content-between">
-    
                 <div class="w-2 flex align-items-center gap-3">
-    
-                    <i class="pi pi-angle-left ml-4 text-3xl"></i>
-    
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOxYHstHPaqXtUZFjxrqn88O3mGfNcNXMlwQ&s"
-                        class="profImg" style="border-radius: 100%; height: 50px; width: 50px;" alt="">
-    
+                    <i (click)="toggleInboxView()" class="mobileBtn pi pi-angle-left ml-4 text-3xl"></i>
+                    <img [src]="openedChat?.profileImg"
+                        class="profImg" alt="">
                     <div class="userName">
-                        <p class=" w-9rem">User Name</p>
+                        <p class="w-9rem">{{openedChat?.name || 'NaN'}}</p>
                     </div>
                 </div>
-    
                 <div class="iconBtns m-4 flex gap-4">
                     <i class="pi pi-video text-2xl"></i>
                     <i class="pi pi-phone text-2xl"></i>
-    
                 </div>
             </div>
         </div>
         <div class="chat-body">
             <div class="noMessage flex justify-content-center align-items-center">
-            <h2 *ngIf="isMessages < 1">Send something 😁</h2>
-
-            </div>
-            <div *ngFor="let message of messages" class="message"
-                [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [@messageAnimation]>
+                <h2 *ngIf="isMessages < 1">Send something 😁</h2>
+              </div>
+              <div *ngFor="let message of messages" class="message" [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}">
                 {{ message.content }}
-                <!-- <span *ngIf="isSending" class="miniLoader"></span> -->
-            </div>
-                
-
+              </div>
         </div>
         <form [formGroup]="messageForm" (ngSubmit)="sendMessage()"
-            class="flex align-items-center justify-content-center gap-4 w-full">
-    
-            <input pInputText type="text" class="h-5rem" style="border-radius: 30px; max-width: 30vh; width: 100%;"
-                formControlName="content" placeholder="Type a message..." class="message-input">
+            class="chat-input flex align-items-center justify-content-center gap-4 w-full">
+            <input pInputText style="border-radius: 30px; max-width: 30vh; width: 100%;" type="text" formControlName="content" placeholder="Type a message...">
             <button type="submit" pButton [disabled]="!messageForm.valid" class="send-button">Send</button>
-    
         </form>
     </div>
 </div>

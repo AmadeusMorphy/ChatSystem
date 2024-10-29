@@ -62,12 +62,12 @@ export class AddFriendComponent {
     const chosenFriend = this.users[index].id;
     console.log(chosenFriend);
     
-    this.userService.addFriend(chosenFriend).subscribe(
+    this.userService.sendReq(chosenFriend).subscribe(
       res => {
         console.log("Friend was added: ", res);
         
       }, err => {
-        console.log('error stuff');
+        console.log('error stuff', err);
         
       }
     )

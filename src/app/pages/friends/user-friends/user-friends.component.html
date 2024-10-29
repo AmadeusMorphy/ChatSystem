@@ -9,9 +9,9 @@
             <img *ngIf="user.profileImg && user.profileImg.length > 0" [src]="user.profileImg"
                 [hidden]="imgLoadingStates[i]" [ngClass]="imgLoadingStates[i] ? 'hidden' : ''" (load)="imgLoaded(i)">
 
-            <!-- <img *ngIf="!user.profileImg || user.profileImg.length < 1" src="assets/image1.png" alt=""> -->
+            <img *ngIf="!user.profileImg || user.profileImg.length < 1" src="assets/image1.png" alt="">
         </div>
-        <p class="name">{{user.name}}</p>
+        <p class="name">{{user.name || 'NaN'}}</p>
         <div class="textContainer flex justify-content-around align-items-center p-3">
             <button pButton
                 (click)="selectUser(i)">View profile</button>

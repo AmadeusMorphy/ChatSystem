@@ -22,14 +22,9 @@ import { v4 as uuidv4 } from 'uuid';
 export class ChatComponent implements OnInit, OnDestroy {
   messages: any[] = [];
   messageForm: FormGroup;
-  fakeUsers = [
-    { id: 1, name: 'User1', status: 'Online', profileImage: 'https://via.placeholder.com/50' },
-    { id: 2, name: 'User2', status: 'Offline', profileImage: 'https://via.placeholder.com/50' },
-    { id: 3, name: 'User3', status: 'Online', profileImage: 'https://via.placeholder.com/50' },
-    // Add more users as needed
-  ];
-
-  selectedUser: string = '';
+  isInboxVisible: boolean = true;
+  isMobileView: boolean = false;
+  selectedUser: any = null;
   private subscription: any;
   currentUserId: any;
   messageId: string = ''
@@ -37,7 +32,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   friends: any;
   friendsBlock: any;
   isSending = false;
-
+  showMessage = false;
+  openedChat: any;
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
@@ -51,6 +47,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.isMobileView = window.innerWidth <= 770;
+    window.addEventListener('resize', () => {
+      this.isMobileView = window.innerWidth <= 770;
+    });
+
     this.loadMessages();
     this.subscribeToMessages();
     this.getCurrentUser();
@@ -183,10 +184,16 @@ async sendMessage() {
   }
 
   selectUser(user: any) {
+    this.messageId = user[0].id;
+    this.filterSelectedFriend(this.messageId);
     this.selectedUser = user[0].id
-    this.messageId = user[0].id
-    console.log('Selected user:', this.messageId);
-    this.filterSelectedFriend(this.messageId)
+    this.isInboxVisible = false;
+    this.openedChat = user[0]
+    console.log('Selected user:', user[0]);
     // Handle user selection logic here
+  }
+
+  toggleInboxView() {
+  this.isInboxVisible = !this.isInboxVisible;
   }
 }
