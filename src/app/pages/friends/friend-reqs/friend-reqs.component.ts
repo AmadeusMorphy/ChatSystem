@@ -15,7 +15,7 @@ export class FriendReqsComponent {
   counter: any;
   constructor(
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getUserData()
@@ -30,10 +30,10 @@ export class FriendReqsComponent {
     this.userService.getCurrentUserData().subscribe(
       res => {
         console.log(res);
-        
+
         this.counter = res[0].friendReqs?.length;
 
-        
+
         const userRequests = [];
 
         for (let i = 0; i < this.counter; i++) {
@@ -47,7 +47,7 @@ export class FriendReqsComponent {
 
             this.users = userResponses;
             console.log("Friends Block: ", this.users);
-            
+
           },
           (error) => {
             console.error('Error fetching user data: ', error);

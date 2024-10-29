@@ -1,10 +1,14 @@
 <div class="dmsContainer flex justify-content-between">
     <!-- User List / Inbox -->
     <div *ngIf="isInboxVisible || !selectedUser || !isMobileView" class="user-list">
-        <div class="user" *ngFor="let user of friendsBlock" (click)="selectUser(user)">
-            <img [src]="user[0]?.profileImg" class="user-img">
+
+        <app-users-loading *ngIf="isUsersLoading"></app-users-loading>
+
+        <div class="user" *ngFor="let user of friendsBlock" (click)="selectUser(user)" [hidden]="isUsersLoading">
+            <img *ngIf="user[0].profileImg" [src]="user[0]?.profileImg" class="user-img">
+            <img *ngIf="!user[0].profileImg || user[0].profileImg.length < 1" src="assets/image1.png" class="user-img">
             <div class="user-info">
-                <p class="user-name">{{ user[0]?.name }}</p>
+                <p class="user-name">{{ user[0]?.name || 'username' }}</p>
                 <p class="user-status">{{ user[0].id }}</p>
             </div>
         </div>
@@ -13,10 +17,13 @@
     <!-- Chat Container -->
     <div *ngIf="(!isInboxVisible || selectedUser || !isMobileView) && selectedUser" class="chat-container">
         <div class="chat-header">
-            <div class="headerItems flex align-items-center justify-content-between">
+            <div class="headerItems flex align-items-center justify-content-between p-3">
                 <div class="w-2 flex align-items-center gap-3">
-                    <i (click)="toggleInboxView()" class="mobileBtn pi pi-angle-left ml-4 text-3xl"></i>
-                    <img [src]="openedChat?.profileImg" class="profImg" alt="">
+                    <i (click)="toggleInboxView()" class="mobileBtn pi pi-angle-left ml-2 text-3xl"></i>
+                    <img *ngIf="openedChat.profileImg" [src]="openedChat?.profileImg" class="profImg" alt="">
+                    <img *ngIf="!openedChat.profileImg || openedChat.profileImg.length < 1" src="assets/image1.png"
+                        class="profImg">
+
                     <div class="userName">
                         <p class="w-9rem">{{openedChat?.name || 'NaN'}}</p>
                     </div>
@@ -29,17 +36,19 @@
         </div>
         <div class="chat-body">
             <div class="noMessage flex justify-content-center align-items-center">
-                <h2 *ngIf="isMessages < 1"  [hidden]="isChatLoading">Send something 😁</h2>
+                <h2 *ngIf="isMessages < 1" [hidden]="isChatLoading">Send something 😁</h2>
             </div>
             <div *ngFor="let skeleton of shuffledSkeletons" class="skeletonChat" [hidden]="!isChatLoading">
-                <p-skeleton [width]="skeleton.width" [height]="skeleton.height" [styleClass]="skeleton.styleClass" borderRadius="16px" />
+                <p-skeleton [width]="skeleton.width" [height]="skeleton.height" [styleClass]="skeleton.styleClass"
+                    borderRadius="16px" />
             </div>
             <div *ngFor="let message of messages" class="message"
-                [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [hidden]="isChatLoading">
+                [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}"
+                [hidden]="isChatLoading">
                 {{ message.content }}
             </div>
         </div>
-        <form [formGroup]="messageForm" (ngSubmit)="sendMessage()"
+        <form *ngIf="selectedUser" [formGroup]="messageForm" (ngSubmit)="sendMessage()"
             class="chat-input flex align-items-center justify-content-center gap-4 w-full">
             <input pInputText style="border-radius: 30px; max-width: 30vh; width: 100%;" type="text"
                 formControlName="content" placeholder="Type a message...">

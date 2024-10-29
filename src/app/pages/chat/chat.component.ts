@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../services/user.service';
 import { forkJoin } from 'rxjs';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-chat',
@@ -35,6 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   showMessage = false;
   openedChat: any;
   isChatLoading = false;
+  isUsersLoading = false;
 
   skeletons = [
     { width: '20rem', height: '5rem', styleClass: 'mb-2 ml-auto' },
@@ -79,10 +80,12 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   getFriends() {
+    this.isUsersLoading = true;
+
     this.userService.getCurrentUserData().subscribe(
       res => {
         console.log(res);
-        
+
         const counter = res[0].friendships?.length;
         const userRequests = [];
 
@@ -91,21 +94,22 @@ export class ChatComponent implements OnInit, OnDestroy {
           userRequests.push(this.userService.getUserById(chosenUser));
         }
 
-        // Use forkJoin to wait for all requests to finish
         forkJoin(userRequests).subscribe(
           (userResponses: any[]) => {
 
             this.friendsBlock = userResponses;
             console.log("Friends Block: ", this.friendsBlock);
-            
+            this.isUsersLoading = false;
           },
           (error) => {
             console.error('Error fetching user data: ', error);
-
+            this.isUsersLoading = false;
           }
         );
+
       },
       (error) => {
+        this.isUsersLoading = false;
         console.error("Error fetching current user data: ", error);
       }
     )
@@ -140,7 +144,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       (newMessage) => {
         // Only add if the message does not already exist
         const messageExists = this.messages.some((msg) => msg.id === newMessage.id);
-        
+
         if (!messageExists) {
           this.messages.push(newMessage);
         }
@@ -150,46 +154,46 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     );
   }
-  
 
-async sendMessage() {
-  this.isSending = true;
-  if (this.messageForm.valid) {
-    const content = this.messageForm.get('content')?.value;
-    
-    // Create a temporary message to display immediately
-    const tempMessage = {
-      id: uuidv4(),
-      content: content,
-      sender_id: this.currentUserId,
-      timestamp: new Date(),
-      isTemporary: true // Flag to differentiate unsaved messages
-    };
 
-    // Add the temporary message to the messages array
-    this.messages.push(tempMessage);
-    this.messageForm.reset(); // Clear the input field
+  async sendMessage() {
+    this.isSending = true;
+    if (this.messageForm.valid) {
+      const content = this.messageForm.get('content')?.value;
 
-    try {
-      // Send the message to the backend
-      const { data, error } = await this.supabase.sendMessage(content, this.selectedUser);
+      /***TO SHOW THE SENT MESSAGE BEFORE THE BACKEND STARTS***/
+      const tempMessage = {
+        id: uuidv4(),
+        content: content,
+        sender_id: this.currentUserId,
+        timestamp: new Date(),
+        isTemporary: true
+      };
 
-      if (error) {
-        console.error('Error sending message:', error);
-        // Handle error by removing the temporary message
+
+      this.messages.push(tempMessage);
+      this.messageForm.reset();
+      /********************************************************/
+      try {
+        // Send the message to the backend
+        const { data, error } = await this.supabase.sendMessage(content, this.selectedUser);
+
+        if (error) {
+          console.error('Error sending message:', error);
+          // Handle error by removing the temporary message
+          this.messages = this.messages.filter((msg) => msg !== tempMessage);
+        } else {
+          this.isSending = false;
+          // Replace the temporary message with the saved message data from the backend
+          this.subscribeToMessages()
+          Object.assign(tempMessage, data, { isTemporary: false });
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
         this.messages = this.messages.filter((msg) => msg !== tempMessage);
-      } else {
-        this.isSending = false;
-        // Replace the temporary message with the saved message data from the backend
-        this.subscribeToMessages()
-        Object.assign(tempMessage, data, { isTemporary: false });
       }
-    } catch (err) {
-      console.error('Unexpected error:', err);
-      this.messages = this.messages.filter((msg) => msg !== tempMessage);
     }
   }
-}
 
 
   async getCurrentUser() {
@@ -210,17 +214,16 @@ async sendMessage() {
     this.isInboxVisible = false;
     this.openedChat = user[0]
     console.log('Selected user:', user[0]);
-    // Handle user selection logic here
-}
+  }
 
   toggleInboxView() {
-  this.isInboxVisible = !this.isInboxVisible;
+    this.selectedUser = null;
+    this.isInboxVisible = !this.isInboxVisible;
   }
 
   shuffleSkeletons() {
     this.shuffledSkeletons = [...this.skeletons]
-      .sort(() => Math.random() - 0.5); // Randomly reorder skeletons
+      .sort(() => Math.random() - 0.5);
   }
-
 
 }

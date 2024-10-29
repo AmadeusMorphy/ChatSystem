@@ -24,6 +24,7 @@ import { FriendReqsComponent } from './pages/friends/friend-reqs/friend-reqs.com
 import { SkeletonModule } from 'primeng/skeleton';
 import {NgxImageCompressService} from 'ngx-image-compress';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
+import { UsersLoadingComponent } from './pages/widgets/loading/users-loading/users-loading.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,7 +35,8 @@ import { LazyLoadImageModule } from 'ng-lazyload-image';
     HeaderComponent,
     AddFriendComponent,
     UserFriendsComponent,
-    FriendReqsComponent
+    FriendReqsComponent,
+    UsersLoadingComponent
   ],
   imports: [
     BrowserModule,

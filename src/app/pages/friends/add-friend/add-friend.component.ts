@@ -33,18 +33,18 @@ export class AddFriendComponent {
     this.userService.getData().subscribe(
       res => {
         this.users = res.filter((item: any) => {
-          if(item.id === this.currentUserId) return false;
+          if (item.id === this.currentUserId) return false;
           // console.log(item.friendships?.some((item: any) => item.friendId));
           // console.log(this.currentUserId);
-          
-          if(item.friendships?.some((item: any) => item?.friendId === this.currentUserId)) return false;
-          
+
+          if (item.friendships?.some((item: any) => item?.friendId === this.currentUserId)) return false;
+
           return true;
         })
         // console.log(this.users);
         this.isLoading = false;
 
-        
+
         this.imgLoadingStates = new Array(this.users.length).fill(true);
       }, err => {
         this.isLoading = false;
@@ -61,29 +61,29 @@ export class AddFriendComponent {
     console.log('You selected this: ', this.users[index]);
     const chosenFriend = this.users[index].id;
     console.log(chosenFriend);
-    
+
     this.userService.sendReq(chosenFriend).subscribe(
       res => {
         console.log("Friend was added: ", res);
-        
+
       }, err => {
         console.log('error stuff', err);
-        
+
       }
     )
   }
 
-//   compressFile() {
-//     this.imageCompress.uploadFile().then(({image, orientation}) => {
-//         this.imgResultBeforeCompression = image;
-//         console.log('Size in bytes of the uploaded image was:', this.imageCompress.byteCount(image));
+  //   compressFile() {
+  //     this.imageCompress.uploadFile().then(({image, orientation}) => {
+  //         this.imgResultBeforeCompression = image;
+  //         console.log('Size in bytes of the uploaded image was:', this.imageCompress.byteCount(image));
 
-//         this.imageCompress
-//             .compressFile(image, orientation, 50, 50) // 50% ratio, 50% quality
-//             .then(compressedImage => {
-//                 this.imgResultAfterCompression = compressedImage;
-//                 console.log('Size in bytes after compression is now:', this.imageCompress.byteCount(compressedImage));
-//             });
-//     });
-// }
+  //         this.imageCompress
+  //             .compressFile(image, orientation, 50, 50) // 50% ratio, 50% quality
+  //             .then(compressedImage => {
+  //                 this.imgResultAfterCompression = compressedImage;
+  //                 console.log('Size in bytes after compression is now:', this.imageCompress.byteCount(compressedImage));
+  //             });
+  //     });
+  // }
 }

@@ -17,7 +17,7 @@ export class UserService {
     private router: Router
   ) {
     this.currentUserId = localStorage.getItem('userId');
-   }
+  }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -26,54 +26,54 @@ export class UserService {
       .set('X-MRNZD-KEY', environment.apiKey);
   }
 
-  getData(): Observable<any>{
-    return this.http.get(`${environment.apiUrl}/key?key=nizaR*123`, {headers: this.getHeaders()});
+  getData(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/key?key=nizaR*123`, { headers: this.getHeaders() });
   }
-  
+
   login(email: string, password: string): Observable<any> {
-    return this.http.post<{ token: string }>(`${environment.apiUrl}/login`,{email, password}, {headers: this.getHeaders()});
+    return this.http.post<{ token: string }>(`${environment.apiUrl}/login`, { email, password }, { headers: this.getHeaders() });
   }
 
   signUp(name: string, email: string, password: string, age: number, dateCreated: Date): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/users`, { name, email, password, age, dateCreated }, {headers: this.getHeaders()});
+    return this.http.post(`${environment.apiUrl}/users`, { name, email, password, age, dateCreated }, { headers: this.getHeaders() });
   }
 
   getUserId(): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/validate-token`, {headers: this.getHeaders()});
+    return this.http.get(`${environment.apiUrl}/validate-token`, { headers: this.getHeaders() });
   }
 
   getUserById(userId: string): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/${userId}`, {headers: this.getHeaders()});
+    return this.http.get(`${environment.apiUrl}/${userId}`, { headers: this.getHeaders() });
   }
 
   getCurrentUserData(): Observable<any> {
-    return this.http.get(`${environment.apiUrl}/${this.currentUserId}`, {headers: this.getHeaders()});
+    return this.http.get(`${environment.apiUrl}/${this.currentUserId}`, { headers: this.getHeaders() });
   }
 
   sendReq(idFriend: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/send-req/${this.currentUserId}`, {friendId: idFriend}, {headers: this.getHeaders()});
+    return this.http.post(`${environment.apiUrl}/send-req/${this.currentUserId}`, { friendId: idFriend }, { headers: this.getHeaders() });
   }
 
   addFriend(idFriend: string): Observable<any> {
 
-    return this.http.post(`${environment.apiUrl}/add-friend/${this.currentUserId}`, {friendId: idFriend}, {headers: this.getHeaders()});
+    return this.http.post(`${environment.apiUrl}/add-friend/${this.currentUserId}`, { friendId: idFriend }, { headers: this.getHeaders() });
   }
 
   checkUserLoggedIn() {
     const token = localStorage.getItem('token');
 
-    if(token) {
+    if (token) {
       return;
-    }else{
+    } else {
       return this.router.navigate(['/auth']);
     }
   }
   logout() {
     localStorage.removeItem('token');
-  
+
     // Create a new URL with a timestamp query parameter to prevent caching
     const newUrl = `${window.location.origin}${window.location.pathname}?cacheBust=${new Date().getTime()}`;
-    
+
     // Redirect to the new URL to hard reload and avoid cached data
     window.location.href = newUrl;
   }

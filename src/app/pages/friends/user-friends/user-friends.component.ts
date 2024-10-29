@@ -62,7 +62,7 @@ export class UserFriendsComponent {
   }
 
   selectUser(index: any) {
-    console.log('You selected this: ',index);
-    
+    console.log('You selected this: ', index);
+
   }
 }
