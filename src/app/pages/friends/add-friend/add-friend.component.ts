@@ -24,6 +24,7 @@ export class AddFriendComponent {
   }
 
   getUsers() {
+    this.isLoading = true
     this.userService.getData().subscribe(
       res => {
         this.users = res.filter((item: any) => {
@@ -32,8 +33,13 @@ export class AddFriendComponent {
           return true;
         })
         console.log(this.users);
+        this.isLoading = false;
+
         
         this.imgLoadingStates = new Array(this.users.length).fill(true);
+      }, err => {
+        this.isLoading = false;
+        console.error("error stuff: ", err);
       }
     )
   }
