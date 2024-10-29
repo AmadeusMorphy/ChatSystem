@@ -5,6 +5,13 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../services/user.service';
 import { forkJoin } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
+import { MessageService } from 'primeng/api';
+import { ImageUploadChatService } from '../services/image-upload-chat.service';
+
+interface UploadEvent {
+  originalEvent: Event;
+  files: File[];
+}
 
 @Component({
   selector: 'app-chat',
@@ -36,6 +43,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   openedChat: any;
   isChatLoading = false;
   isUsersLoading = false;
+  uploadedFiles: any[] = [];
+  previewUrl: string | null = null;
 
   skeletons = [
     { width: '20rem', height: '5rem', styleClass: 'mb-2 ml-auto' },
@@ -52,7 +61,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
-    private userService: UserService
+    private userService: UserService,
+    private messageService: MessageService,
+    private imageService: ImageUploadChatService
   ) {
     this.currentUserId = localStorage.getItem('userId');
     this.messageForm = this.formBuilder.group({
@@ -167,6 +178,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         content: content,
         sender_id: this.currentUserId,
         timestamp: new Date(),
+        imageUrl: this.previewUrl,
         isTemporary: true
       };
 
@@ -225,5 +237,38 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.shuffledSkeletons = [...this.skeletons]
       .sort(() => Math.random() - 0.5);
   }
+  onFileSelected(event: Event): void {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.previewUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
+  onUpload(event: any) {
+    for (let file of event.files) {
+      this.uploadedFiles.push(file); // Store uploaded files in the array
+      this.uploadImageToImgBB(file);
+    }
+  }
+
+
+  uploadImageToImgBB(file: File): void {
+    this.imageService.uploadImage(file).subscribe(
+      response => {
+        if (response && response.data && response.data.url) {
+          console.log('Image uploaded successfully:', response.data.url);
+          this.messageService.add({ severity: 'success', summary: 'File Uploaded', detail: 'Image uploaded successfully!' });
+        }
+      },
+      error => {
+        console.error('Upload failed:', error);
+        this.messageService.add({ severity: 'error', summary: 'Upload Failed', detail: 'Could not upload image.' });
+      }
+    );
+  }
 }

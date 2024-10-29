@@ -25,6 +25,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import {NgxImageCompressService} from 'ngx-image-compress';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { UsersLoadingComponent } from './pages/widgets/loading/users-loading/users-loading.component';
+import { FileUploadModule } from 'primeng/fileupload';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -53,7 +55,8 @@ import { UsersLoadingComponent } from './pages/widgets/loading/users-loading/use
     ToastModule,
     ConfirmDialogModule,
     SkeletonModule,
-    LazyLoadImageModule
+    LazyLoadImageModule,
+    FileUploadModule
   ],
   providers: [ConfirmationService, MessageService, NgxImageCompressService],
   bootstrap: [AppComponent]
