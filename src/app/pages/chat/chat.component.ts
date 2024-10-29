@@ -36,6 +36,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   isMessages: any;
   friends: any;
   friendsBlock: any;
+  isSending = false;
 
   constructor(
     private supabase: SupabaseService,
@@ -133,6 +134,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   
 
 async sendMessage() {
+  this.isSending = true;
   if (this.messageForm.valid) {
     const content = this.messageForm.get('content')?.value;
     
@@ -158,6 +160,7 @@ async sendMessage() {
         // Handle error by removing the temporary message
         this.messages = this.messages.filter((msg) => msg !== tempMessage);
       } else {
+        this.isSending = false;
         // Replace the temporary message with the saved message data from the backend
         this.subscribeToMessages()
         Object.assign(tempMessage, data, { isTemporary: false });

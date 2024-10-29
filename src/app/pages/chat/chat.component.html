@@ -48,6 +48,7 @@
             <div *ngFor="let message of messages" class="message"
                 [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}" [@messageAnimation]>
                 {{ message.content }}
+                <!-- <span *ngIf="isSending" class="miniLoader"></span> -->
             </div>
                 
 

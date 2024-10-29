@@ -138,7 +138,9 @@
         line-height: 1.5;
         animation: popIn 0.2s ease-in-out;
         position: relative;
-  
+        word-wrap: break-word; /* Allows long text to wrap */
+        white-space: pre-wrap; /* Preserves spacing and wraps text */
+        overflow-wrap: break-word; 
         p {
           margin: 0;
         }
@@ -270,4 +272,41 @@ i{
 .user-status {
     font-size: 0.85rem;
     color: #b3b3b3;
+}
+
+
+
+//SMALL LOADING//
+
+/* From Uiverse.io by Shoh2008 */ 
+.miniLoader {
+  position: relative;
+}
+
+.miniLoader:before , .miniLoader:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  rotate: 90deg;
+  border-radius: 50%;
+  background: #FFF;
+  transform: translate(-50% , -100%)  scale(0);
+  animation: push_401 2s infinite linear;
+}
+
+.miniLoader:after {
+  animation-delay: 1s;
+}
+
+@keyframes push_401 {
+  0% , 50% {
+    transform: translate(-50% , 0%)  scale(1)
+  }
+
+  100% {
+    transform: translate(-50%, -100%) scale(0)
+  }
 }
