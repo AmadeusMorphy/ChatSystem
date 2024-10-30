@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef  } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../services/user.service';
 import { forkJoin } from 'rxjs';
@@ -26,7 +26,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   @ViewChild('chatBody', { static: false }) private chatBody!: ElementRef;
 
-
   messages: any[] = [];
   messageForm: FormGroup;
   isInboxVisible: boolean = true;
@@ -44,8 +43,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   uploadedFiles: any[] = [];
   previewUrl: string | null = null;
   isImage = false;
+  removeImageInput!: HTMLInputElement;
+
   private shouldScrollToBottom = false;
-  
+
   skeletons = [
     { width: '20rem', height: '5rem', styleClass: 'mb-2 ml-auto' },
     { width: '10rem', height: '3rem', styleClass: 'mb-2' },
@@ -56,9 +57,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     { width: '10rem', height: '4rem', styleClass: 'mb-2 ml-auto' }
   ];
 
-
   shuffledSkeletons = [...this.skeletons];
-  
+
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
@@ -68,13 +68,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     private changeRef: ChangeDetectorRef
   ) {
     this.currentUserId = localStorage.getItem('userId');
+    
     this.messageForm = this.formBuilder.group({
       content: [''],
       sender: this.currentUserId
     });
   }
 
-  
+
   ngOnInit() {
     this.isMobileView = window.innerWidth <= 770;
     window.addEventListener('resize', () => {
@@ -91,12 +92,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
   }
 
-
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
   }
+
   private scrollToBottom(): void {
     try {
       if (this.chatBody && this.chatBody.nativeElement) {
@@ -106,7 +107,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       console.error('Scroll error:', err);
     }
   }
-
 
   private checkAndScroll(): void {
     if (this.shouldScrollToBottom) {
@@ -162,6 +162,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     )
   }
+
   async loadMessages() {
     this.isChatLoading = true;
     const { data, error } = await this.supabase.getMessages(this.messageId);
@@ -195,14 +196,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
   }
 
-
   async sendMessage() {
     this.isSending = true;
     const theImage = this.previewUrl;
-    this.previewUrl = null;
+    const content = this.messageForm.get('content')?.value; 
+    
     if (this.messageForm.valid) {
-      const content = this.messageForm.get('content')?.value;
-      
       const tempMessage = {
         id: uuidv4(),
         content: content,
@@ -211,19 +210,21 @@ export class ChatComponent implements OnInit, OnDestroy {
         images_url: theImage,
         isTemporary: true
       };
-
+  
       this.messages.push(tempMessage);
       this.messageForm.reset();
-      
+  
       try {
         const { data, error } = await this.supabase.sendMessage(content, this.selectedUser, theImage);
-        
+  
         if (error) {
           console.error('Error sending message:', error);
           this.messages = this.messages.filter((msg) => msg !== tempMessage);
         } else {
           this.isSending = false;
           Object.assign(tempMessage, data, { isTemporary: false });
+          this.resetForm();
+          this.changeRef.detectChanges();
           this.subscribeToMessages();
         }
       } catch (err) {
@@ -286,32 +287,25 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   removeImage(fileInput: HTMLInputElement): void {
     this.previewUrl = null;
-    this.isImage = false; // Reset the flag to re-enable the input
-    this.resetForm();
-    fileInput.value = ''; // Reset the file input value to allow re-uploading
-    this.changeRef.detectChanges(); // Trigger change detection
+    this.isImage = false;
+    fileInput.value = '';
+    this.changeRef.detectChanges();
   }
 
   onUpload(event: any) {
     for (let file of event.files) {
-      this.uploadedFiles.push(file); // Store uploaded files in the array
+      this.uploadedFiles.push(file);
       this.uploadImageToImgBB(file);
     }
   }
-
- 
-
-  // ngAfterViewChecked() {
-  //   if (this.shouldScrollToBottom) {
-  //     this.scrollToBottom();
-  //     this.shouldScrollToBottom = false;
-  //   }
-  // }
 
   resetForm(): void {
     this.messageForm.reset();
     this.isImage = false;
     this.previewUrl = null;
+    if (this.removeImageInput) {
+      this.removeImageInput.value = '';
+    }
   }
 
   uploadImageToImgBB(file: File): void {
@@ -336,14 +330,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   isTextInputEmpty(): boolean {
-    return this.messageForm.controls['content'].value?.trim() === '';
+    return !this.messageForm.controls['content'].value || this.messageForm.controls['content'].value.trim() === '';
   }
-
-  checkFormStatus(): void {
-    this.messageForm.updateValueAndValidity();
-  }
-
+  
   isFormValid(): boolean {
-    return this.isImage || this.messageForm.controls['content'].value?.trim();
+    return this.isImage || (this.messageForm.controls['content'].value && this.messageForm.controls['content'].value.trim() !== '');
   }
+  
+    checkFormStatus(): void {
+      this.messageForm.updateValueAndValidity();
+    }
 }

@@ -59,20 +59,16 @@
                 formControlName="content" placeholder="Type a message..." class="" [ngClass]="isImage ? 'hidden' : ''"
                 (input)="checkFormStatus()" (input)="onInputChange()">
 
-            <div class="custom-upload" *ngIf="isTextInputEmpty()">
-                <i class="pi pi-image text-2xl" (click)="fileInput.click()" style="cursor: pointer;"></i>
+            <div class="custom-upload" *ngIf="isTextInputEmpty() || isImage">
+                <i *ngIf="!isImage" class="pi pi-image text-2xl" (click)="fileInput.click()"
+                    style="cursor: pointer;"></i>
                 <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
                 <div *ngIf="previewUrl" class="image-preview">
                     <img [src]="previewUrl" class="thumbnail" alt="Preview Image">
                     <i class="pi pi-times remove_img" (click)="removeImage(fileInput)"></i>
-                    <!-- <button type="button" (click)="removeImage()" class="remove-image-btn">Remove</button> -->
                 </div>
             </div>
-
             <button type="submit" pButton [disabled]="!isFormValid()" class="send-button">Send</button>
         </form>
-
-
-
     </div>
 </div>
