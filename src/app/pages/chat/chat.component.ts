@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef  } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -7,11 +7,6 @@ import { forkJoin } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { MessageService } from 'primeng/api';
 import { ImageUploadChatService } from '../services/image-upload-chat.service';
-
-interface UploadEvent {
-  originalEvent: Event;
-  files: File[];
-}
 
 @Component({
   selector: 'app-chat',
@@ -26,7 +21,12 @@ interface UploadEvent {
     ])
   ]
 })
+
 export class ChatComponent implements OnInit, OnDestroy {
+
+  @ViewChild('chatBody', { static: false }) private chatBody!: ElementRef;
+
+
   messages: any[] = [];
   messageForm: FormGroup;
   isInboxVisible: boolean = true;
@@ -34,18 +34,18 @@ export class ChatComponent implements OnInit, OnDestroy {
   selectedUser: any = null;
   private subscription: any;
   currentUserId: any;
-  messageId: string = ''
+  messageId: string = '';
   isMessages: any;
-  friends: any;
   friendsBlock: any;
   isSending = false;
-  showMessage = false;
   openedChat: any;
   isChatLoading = false;
   isUsersLoading = false;
   uploadedFiles: any[] = [];
   previewUrl: string | null = null;
-
+  isImage = false;
+  private shouldScrollToBottom = false;
+  
   skeletons = [
     { width: '20rem', height: '5rem', styleClass: 'mb-2 ml-auto' },
     { width: '10rem', height: '3rem', styleClass: 'mb-2' },
@@ -56,22 +56,25 @@ export class ChatComponent implements OnInit, OnDestroy {
     { width: '10rem', height: '4rem', styleClass: 'mb-2 ml-auto' }
   ];
 
-  shuffledSkeletons = [...this.skeletons];
 
+  shuffledSkeletons = [...this.skeletons];
+  
   constructor(
     private supabase: SupabaseService,
     private formBuilder: FormBuilder,
     private userService: UserService,
     private messageService: MessageService,
-    private imageService: ImageUploadChatService
+    private imageService: ImageUploadChatService,
+    private changeRef: ChangeDetectorRef
   ) {
     this.currentUserId = localStorage.getItem('userId');
     this.messageForm = this.formBuilder.group({
-      content: ['', Validators.required],
+      content: [''],
       sender: this.currentUserId
     });
   }
 
+  
   ngOnInit() {
     this.isMobileView = window.innerWidth <= 770;
     window.addEventListener('resize', () => {
@@ -81,12 +84,34 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loadMessages();
     this.subscribeToMessages();
     this.getCurrentUser();
-    this.getFriends()
+    this.getFriends();
   }
+
+  ngAfterViewInit() {
+    this.scrollToBottom();
+  }
+
 
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+  }
+  private scrollToBottom(): void {
+    try {
+      if (this.chatBody && this.chatBody.nativeElement) {
+        this.chatBody.nativeElement.scrollTop = this.chatBody.nativeElement.scrollHeight;
+      }
+    } catch (err) {
+      console.error('Scroll error:', err);
+    }
+  }
+
+
+  private checkAndScroll(): void {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
     }
   }
 
@@ -139,27 +164,29 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
   async loadMessages() {
     this.isChatLoading = true;
-
     const { data, error } = await this.supabase.getMessages(this.messageId);
     if (error) {
       console.error('Error fetching messages:', error);
       this.isChatLoading = false;
     } else {
-      console.log("DATA: ", data);
-      
+      this.shouldScrollToBottom = true;
       this.messages = data;
-      this.isMessages = this.messages.length
+      this.isMessages = this.messages.length;
       this.isChatLoading = false;
+      this.changeRef.detectChanges();
+      this.checkAndScroll();
     }
   }
+
   subscribeToMessages() {
     this.subscription = this.supabase.subscribeToMessages().subscribe(
       (newMessage) => {
-        // Only add if the message does not already exist
         const messageExists = this.messages.some((msg) => msg.id === newMessage.id);
-
         if (!messageExists) {
           this.messages.push(newMessage);
+          this.shouldScrollToBottom = true;
+          this.changeRef.detectChanges();
+          this.checkAndScroll();
         }
       },
       (error) => {
@@ -174,43 +201,40 @@ export class ChatComponent implements OnInit, OnDestroy {
     const theImage = this.previewUrl;
     this.previewUrl = null;
     if (this.messageForm.valid) {
-        const content = this.messageForm.get('content')?.value;
-        
-        // Show the temporary message before the backend starts
-        const tempMessage = {
-            id: uuidv4(),
-            content: content,
-            sender_id: this.currentUserId,
-            timestamp: new Date(),
-            images_url: theImage,  // Include the preview URL here
-            isTemporary: true
-        };
+      const content = this.messageForm.get('content')?.value;
+      
+      const tempMessage = {
+        id: uuidv4(),
+        content: content,
+        sender_id: this.currentUserId,
+        timestamp: new Date(),
+        images_url: theImage,
+        isTemporary: true
+      };
 
-        this.messages.push(tempMessage);
-        this.messageForm.reset();
+      this.messages.push(tempMessage);
+      this.messageForm.reset();
+      
+      try {
+        const { data, error } = await this.supabase.sendMessage(content, this.selectedUser, theImage);
         
-        try {
-            // Send the message to the backend
-            const { data, error } = await this.supabase.sendMessage(content, this.selectedUser, theImage); // Pass the image URL
-            
-            if (error) {
-                console.error('Error sending message:', error);
-                // Handle error by removing the temporary message
-                this.messages = this.messages.filter((msg) => msg !== tempMessage);
-            } else {
-                this.isSending = false;
-                // Replace the temporary message with the saved message data from the backend
-                this.subscribeToMessages()
-                Object.assign(tempMessage, data, { isTemporary: false });
-            }
-        } catch (err) {
-            console.error('Unexpected error:', err);
-            this.messages = this.messages.filter((msg) => msg !== tempMessage);
+        if (error) {
+          console.error('Error sending message:', error);
+          this.messages = this.messages.filter((msg) => msg !== tempMessage);
+        } else {
+          this.isSending = false;
+          Object.assign(tempMessage, data, { isTemporary: false });
+          this.subscribeToMessages();
         }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        this.messages = this.messages.filter((msg) => msg !== tempMessage);
+      }
     }
-}
-
-
+    this.shouldScrollToBottom = true;
+    this.changeRef.detectChanges();
+    this.checkAndScroll();
+  }
 
   async getCurrentUser() {
     const { data: { user } } = await this.supabase.getCurrentUser();
@@ -222,14 +246,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   selectUser(user: any) {
-    this.shuffleSkeletons();
     this.isChatLoading = true;
     this.messageId = user[0].id;
     this.filterSelectedFriend(this.messageId);
-    this.selectedUser = user[0].id
+    this.shouldScrollToBottom = true;
+    this.scrollToBottom()
+    this.selectedUser = user[0].id;
     this.isInboxVisible = false;
-    this.openedChat = user[0]
-    console.log('Selected user:', user[0]);
+    this.openedChat = user[0];
   }
 
   toggleInboxView() {
@@ -241,6 +265,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.shuffledSkeletons = [...this.skeletons]
       .sort(() => Math.random() - 0.5);
   }
+
   onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files?.[0];
@@ -248,9 +273,23 @@ export class ChatComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target?.result as string;
+        this.isImage = true;
+        this.changeRef.detectChanges();
+        this.checkFormStatus();
       };
       reader.readAsDataURL(file);
     }
+    this.shouldScrollToBottom = true;
+    this.changeRef.detectChanges();
+    this.checkAndScroll();
+  }
+
+  removeImage(fileInput: HTMLInputElement): void {
+    this.previewUrl = null;
+    this.isImage = false; // Reset the flag to re-enable the input
+    this.resetForm();
+    fileInput.value = ''; // Reset the file input value to allow re-uploading
+    this.changeRef.detectChanges(); // Trigger change detection
   }
 
   onUpload(event: any) {
@@ -260,6 +299,20 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
+ 
+
+  // ngAfterViewChecked() {
+  //   if (this.shouldScrollToBottom) {
+  //     this.scrollToBottom();
+  //     this.shouldScrollToBottom = false;
+  //   }
+  // }
+
+  resetForm(): void {
+    this.messageForm.reset();
+    this.isImage = false;
+    this.previewUrl = null;
+  }
 
   uploadImageToImgBB(file: File): void {
     this.imageService.uploadImage(file).subscribe(
@@ -274,5 +327,23 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.messageService.add({ severity: 'error', summary: 'Upload Failed', detail: 'Could not upload image.' });
       }
     );
+  }
+
+  onInputChange() {
+    if (this.messageForm.controls['content'].value) {
+      this.shouldScrollToBottom = true;
+    }
+  }
+
+  isTextInputEmpty(): boolean {
+    return this.messageForm.controls['content'].value?.trim() === '';
+  }
+
+  checkFormStatus(): void {
+    this.messageForm.updateValueAndValidity();
+  }
+
+  isFormValid(): boolean {
+    return this.isImage || this.messageForm.controls['content'].value?.trim();
   }
 }

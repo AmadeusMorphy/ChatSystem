@@ -1,0 +1,12 @@
+<div>
+    <h2>Upload and Display Image</h2>
+  
+    <!-- File input for uploading image -->
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+  
+    <!-- Display uploaded image if available -->
+    <div *ngIf="imageUrl">
+      <h3>Uploaded Image:</h3>
+      <img [src]="imageUrl" alt="Uploaded Image" style="max-width: 300px; max-height: 300px;" />
+    </div>
+  </div>

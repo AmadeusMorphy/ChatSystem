@@ -26,6 +26,7 @@ import {NgxImageCompressService} from 'ngx-image-compress';
 import { LazyLoadImageModule } from 'ng-lazyload-image';
 import { UsersLoadingComponent } from './pages/widgets/loading/users-loading/users-loading.component';
 import { FileUploadModule } from 'primeng/fileupload';
+import { UserProfileComponent } from './pages/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { FileUploadModule } from 'primeng/fileupload';
     AddFriendComponent,
     UserFriendsComponent,
     FriendReqsComponent,
-    UsersLoadingComponent
+    UsersLoadingComponent,
+    UserProfileComponent
   ],
   imports: [
     BrowserModule,

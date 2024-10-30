@@ -51,7 +51,8 @@ export class HeaderComponent {
         this.router.url === '/add-friend' ||
         this.router.url === '/my-profile' ||
         this.router.url === '/friend-req' ||
-        this.router.url === '/friends'
+        this.router.url === '/friends' ||
+        this.router.url === '/user_profile' 
 
     });
   }
