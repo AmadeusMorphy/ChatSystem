@@ -44,6 +44,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   previewUrl: string | null = null;
   isImage = false;
   removeImageInput!: HTMLInputElement;
+  isUserSelected = false;
 
   private shouldScrollToBottom = false;
 
@@ -88,9 +89,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.getFriends();
   }
 
-  ngAfterViewInit() {
-    this.scrollToBottom();
-  }
+  // ngAfterViewInit() {
+  //   this.scrollToBottom();
+  // }
 
   ngOnDestroy() {
     if (this.subscription) {
@@ -164,6 +165,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   async loadMessages() {
+    this.isUserSelected = false;
     this.isChatLoading = true;
     const { data, error } = await this.supabase.getMessages(this.messageId);
     if (error) {
@@ -188,6 +190,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.shouldScrollToBottom = true;
           this.changeRef.detectChanges();
           this.checkAndScroll();
+
         }
       },
       (error) => {
@@ -338,6 +341,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
   
     checkFormStatus(): void {
+      this.isUserSelected = true;
+
       this.messageForm.updateValueAndValidity();
     }
 }

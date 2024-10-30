@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="chat-body" #chatBody>
+        <div class="chat-body" [ngStyle]="{'scroll-behavior': isUserSelected ? 'smooth' : 'auto'}"  #chatBody>
             <div class="noMessage flex justify-content-center align-items-center">
                 <h2 *ngIf="isMessages < 1" [hidden]="isChatLoading">Send something 😁</h2>
             </div>
@@ -44,7 +44,7 @@
             </div>
             <div *ngFor="let message of messages" class="message"
                 [ngClass]="{'sent': isOwnMessage(message), 'received': !isOwnMessage(message)}"
-                [hidden]="isChatLoading">
+                [hidden]="isChatLoading" style="    flex-direction:column-reverse;">
 
                 <img [src]="message.images_url" alt=""
                     style="position: relative; width: 100%; margin-left: auto; border-radius: 20px;">

@@ -10,14 +10,14 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
   .chat-body {
-    flex: 1;
+
     padding: 20px;
     overflow-y: auto;
     display: flex;
-    flex-direction: column;
+    flex-direction:column;
     gap: 12px;
-    scroll-behavior: smooth;
-
+    // scroll-behavior: auto;
+    margin-top: auto;
     /* Hide scrollbar */
     scrollbar-width: none;
     -ms-overflow-style: none;

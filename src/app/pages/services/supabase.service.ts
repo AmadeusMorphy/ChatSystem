@@ -22,12 +22,39 @@ export class SupabaseService {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
-  async getMessages(messageID: string) {
+  async getMessages(messageID: string, limit: number = 18) {
     this.messagesId = messageID;
-    return await this.supabase
+    
+    // First, get the total count of messages
+    const { count, error: countError } = await this.supabase
+      .from(messageID)
+      .select('*', { count: 'exact', head: true });
+  
+    if (countError) {
+      console.error('Error fetching message count:', countError);
+      return { data: null, error: countError };
+    }
+  
+    // Handle potential null count
+    const totalCount = count ?? 0;
+  
+    // Calculate the starting point for our query
+    const start = Math.max(0, totalCount - limit);
+  
+    // Now, fetch the last 'limit' number of messages
+    const { data, error } = await this.supabase
       .from(messageID)
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .range(start, totalCount - 1);
+  
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return { data: null, error };
+    }
+  
+    // The data is already in the correct order (oldest to newest)
+    return { data, error: null };
   }
 
   subscribeToMessages(): Observable<Message> {
